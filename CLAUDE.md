@@ -2,6 +2,8 @@
 
 Bu dosya Claude Code için proje bağlamıdır. Kullanıcı (Burak) Türkçe konuşur; yanıtlar ve oyun içi metinler Türkçedir.
 
+**İş akışı (kullanıcının kalıcı isteği):** her güncellemenin sonunda değişiklikleri bir dalda commit'le, PR aç ve **birleştir (merge)** — ayrıca onay sorma. `gh pr create` GraphQL kullandığı için çalışmaz; REST kullan: `gh api repos/bozukartr/onit/pulls -X POST …` ve `gh api repos/bozukartr/onit/pulls/<n>/merge -X PUT`.
+
 ## Konsept
 Mini Metro estetiğinde, tile tabanlı 2D mobil oyun (PWA). Oyuncu bir otelin **operasyon müdürü**: misafir taleplerini doğru ekip üyesine yönlendirir, oyun gün gün ilerler.
 
