@@ -1,0 +1,38 @@
+{
+  "id": "./",
+  "name": "onit · Otel Operasyonu",
+  "short_name": "onit",
+  "description": "Misafir taleplerini doğru ekibe yönlendir, oteli ayakta tut. Mini Metro tadında bir otel operasyon oyunu.",
+  "lang": "tr",
+  "dir": "ltr",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#F3EEE4",
+  "theme_color": "#F3EEE4",
+  "categories": ["games", "entertainment"],
+  "prefer_related_applications": false,
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "assets/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "assets/brand/onit-mark.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Yeni vardiya",
+      "short_name": "Oyna",
+      "description": "Menüyü atlayıp doğrudan yeni bir vardiya başlat",
+      "url": "./?action=play",
+      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ],
+  "screenshots": [
+    { "src": "assets/screenshots/menu-portrait.png", "sizes": "780x1688", "type": "image/png", "form_factor": "narrow", "label": "Ana menü — canlı otel demosu" },
+    { "src": "assets/screenshots/game-portrait.png", "sizes": "780x1688", "type": "image/png", "form_factor": "narrow", "label": "Talepleri doğru ekibe yönlendir" },
+    { "src": "assets/screenshots/menu-wide.png", "sizes": "1600x900", "type": "image/png", "form_factor": "wide", "label": "Masaüstünde onit" }
+  ]
+}

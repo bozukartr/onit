@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="160 300 932 588" width="932" height="588">
+  <title>onit</title>
+  <rect x="160" y="300" width="932" height="588" fill="#F3EEE4"/>
+  <g fill="none" stroke="#26282E" stroke-width="78" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="356" cy="672" r="86"/>
+    <path d="M530 758V660a71 71 0 0 1 142 0v98"/>
+    <path d="M768 597v161"/>
+    <path d="M887 546v142a70 70 0 0 0 70 70q14 0 26-6"/>
+    <path d="M855 598h127"/>
+  </g>
+  <path d="M766 528Q778 476 828 452" fill="none" stroke="#26282E" stroke-width="10" stroke-linecap="round" stroke-dasharray="14 24"/>
+  <circle cx="875" cy="430" r="40" fill="#E89B13"/>
+</svg>

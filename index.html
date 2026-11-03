@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>onit · Otel Operasyonu</title>
+<meta name="description" content="onit — misafir taleplerini doğru ekibe yönlendirdiğin, Mini Metro tadında bir otel operasyon oyunu. Çevrimdışı çalışır.">
+<meta name="theme-color" content="#F3EEE4">
+<meta name="color-scheme" content="light">
+<meta name="application-name" content="onit">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="onit">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="onit · Otel Operasyonu">
+<meta property="og:description" content="Talepleri doğru ekibe yönlendir, oteli ayakta tut. I'm on it!">
+<meta property="og:image" content="assets/brand/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="mask-icon" href="assets/icons/favicon.svg" color="#E89B13">
+
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/hud.css">
+<link rel="stylesheet" href="css/menu.css">
+<link rel="stylesheet" href="css/overlays.css">
+<link rel="stylesheet" href="css/responsive.css">
+<link rel="modulepreload" href="js/main.js">
+<script type="module" src="js/main.js"></script>
+</head>
+<body class="menu">
+<canvas id="c" aria-label="Otel haritası"></canvas>
+<div id="safe"></div>
+
+<!-- ============ OYUN İÇİ HUD ============ -->
+<div class="hud" id="top">
+  <div id="scoreBox">
+    <div class="score"><span id="score">0</span><small>talep</small></div>
+    <div class="rating" id="ratingBox">
+      <svg viewBox="0 0 24 24" width="14" height="14"><path d="M12 2.6l2.9 6 6.5.8-4.8 4.5 1.2 6.5L12 17.3l-5.8 3.1 1.2-6.5L2.6 9.4l6.5-.8z" fill="currentColor"/></svg>
+      <span id="rating">5,0</span>
+      <div class="rbar"><i id="rfill"></i><b></b></div>
+    </div>
+    <div id="combo"><svg viewBox="0 0 12 12"><path d="M6.6 1 2.5 6.6h3L4.9 11l4.6-6H6.4z" fill="#fff"/></svg><span id="comboTx">SERİ ×2</span></div>
+  </div>
+  <div id="right">
+    <div class="ctrlcol">
+      <div class="ctrls">
+        <button class="btn" id="bPause" aria-label="Duraklat"><svg viewBox="0 0 14 14"><rect x="2.5" y="2" width="3" height="10" rx="1" fill="currentColor"/><rect x="8.5" y="2" width="3" height="10" rx="1" fill="currentColor"/></svg></button>
+        <button class="btn on" id="b1" aria-label="Normal hız"><svg viewBox="0 0 14 14"><path d="M4 2.2v9.6a.6.6 0 0 0 .9.5l7.4-4.8a.6.6 0 0 0 0-1L4.9 1.7a.6.6 0 0 0-.9.5z" fill="currentColor"/></svg></button>
+        <button class="btn" id="b2" aria-label="Hızlı"><svg viewBox="0 0 14 14"><path d="M1 2.6v8.8a.5.5 0 0 0 .8.4L7 8V11.4a.5.5 0 0 0 .8.4l5.6-4a.5.5 0 0 0 0-.8L7.8 2.2a.5.5 0 0 0-.8.4V6L1.8 2.2a.5.5 0 0 0-.8.4z" fill="currentColor"/></svg></button>
+      </div>
+      <div class="ctrls">
+        <button class="btn sm" id="bMute" aria-label="Ses"></button>
+        <button class="btn sm" id="bHelp" aria-label="Nasıl oynanır"><svg viewBox="0 0 14 14"><path d="M5 5.1a2.1 2.1 0 1 1 3 1.9c-.7.3-1 .8-1 1.5v.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="7" cy="11.4" r="1.1" fill="currentColor"/></svg></button>
+      </div>
+    </div>
+    <div id="clockWrap">
+      <svg id="clock" viewBox="-32 -32 64 64">
+        <circle r="29.5" class="cface"/>
+        <path id="cNight" class="cnight"/>
+        <path id="cProg" class="cprog"/>
+        <g id="cTicks"></g>
+        <line id="cHand" x1="0" y1="3" x2="0" y2="-21" class="chand"/>
+        <circle r="2.8" class="cpin"/>
+      </svg>
+      <div id="cLabel"><span id="cDay">PZT</span> <span id="cTime">07:00</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="hud" id="banner"><div class="bt" id="bTitle"></div><div class="bs" id="bSub"></div></div>
+<div class="hud pill" id="toast"></div>
+<div class="hud pill" id="pausePill">Duraklatıldı · rota çizmeye devam edebilirsin</div>
+<div class="hud" id="hint"></div>
+<div class="hud" id="teams"></div>
+
+<!-- ============ ANA MENÜ ============ -->
+<section id="menu" aria-label="Ana menü">
+  <div class="m-col">
+    <header class="m-head">
+      <h1 class="m-logo" id="mLogo" title="onit"><span class="sr">onit</span></h1>
+      <p class="m-tag">Otel Operasyon Müdürü</p>
+    </header>
+    <div class="m-stage" aria-hidden="true"></div>
+    <div class="m-panel" id="mPanel">
+      <ul class="m-teams" id="mTeams" aria-label="Ekipler" style="--d:0s"></ul>
+      <button class="m-play" id="mPlay" style="--d:.06s">
+        <span class="m-play-dot" aria-hidden="true"><svg viewBox="0 0 18 18"><path d="M5 3.2v11.6a.8.8 0 0 0 1.2.7l9.2-5.8a.8.8 0 0 0 0-1.4L6.2 2.5a.8.8 0 0 0-1.2.7z" fill="#fff"/></svg></span>
+        <span class="m-play-tx"><b>Vardiyaya başla</b><small id="mPlaySub">1. gün · Pazartesi 07:00</small></span>
+        <svg class="m-play-arr" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="m-stats" style="--d:.12s" aria-label="Kariyer">
+        <div class="gold"><b id="msBest">—</b><span>Rekor</span></div>
+        <div><b id="msDay">—</b><span>En uzun gün</span></div>
+        <div><b id="msShifts">0</b><span>Vardiya</span></div>
+        <div class="m-first"><i>●</i> İlk vardiyan seni bekliyor</div>
+      </div>
+      <nav class="m-row" style="--d:.18s" aria-label="Menü">
+        <button class="m-btn" id="mHow"><span class="m-ic"><svg viewBox="0 0 14 14"><path d="M5 5.1a2.1 2.1 0 1 1 3 1.9c-.7.3-1 .8-1 1.5v.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="7" cy="11.4" r="1.1" fill="currentColor"/></svg></span><span>Nasıl oynanır</span></button>
+        <button class="m-btn" id="mSound" aria-pressed="true"><span class="m-ic"></span><span class="m-lb">Ses açık</span></button>
+        <button class="m-btn install" id="mInstall" hidden><span class="m-ic"><svg viewBox="0 0 14 14"><path d="M7 1.8v7M4 6l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.2 9.5v1.6c0 .6.5 1.1 1.1 1.1h7.4c.6 0 1.1-.5 1.1-1.1V9.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Yükle</span></button>
+      </nav>
+    </div>
+    <footer class="m-foot"><i>●</i> I'm on it! · <span id="mVer">v1.0.0</span></footer>
+  </div>
+  <button class="m-update" id="mUpdate" hidden>Yeni sürüm hazır · <b>Yenile</b></button>
+</section>
+
+<!-- ============ KATMANLAR ============ -->
+<div id="ov" class="ov" role="dialog" aria-modal="true"></div>
+<div id="curtain"></div>
+
+<noscript><p style="position:fixed;inset:auto 16px 16px;padding:14px;border-radius:14px;background:#26282E;color:#F3EEE4;font:600 14px system-ui">onit için JavaScript gerekli.</p></noscript>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "onit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "onit — Mini Metro tadında otel operasyon oyunu (PWA, bağımlılıksız vanilla JS).",
+  "type": "module",
+  "scripts": {
+    "start": "npx --yes http-server . -p 8080 -c-1",
+    "lint": "npx --yes eslint@10 .",
+    "check": "node scripts/check-precache.mjs",
+    "test": "npm run check && npm run lint"
+  },
+  "license": "UNLICENSED"
+}

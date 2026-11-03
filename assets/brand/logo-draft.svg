@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 150" width="840" height="450">
+  <title>onit</title>
+  <rect width="280" height="150" rx="0" fill="#F3EEE4"/>
+  <g transform="translate(16 12)" fill="none" stroke="#26282E" stroke-width="18" stroke-linecap="round" stroke-linejoin="round">
+    <!-- o -->
+    <circle cx="40" cy="80" r="21"/>
+    <!-- n -->
+    <path d="M96 101V80a21 21 0 0 1 42 0v21"/>
+    <!-- i (gövde) -->
+    <path d="M173 62v39"/>
+    <!-- t -->
+    <path d="M216 36v48a17 17 0 0 0 17 17h3"/>
+    <path d="M204 60h30"/>
+    <!-- noktanın izi -->
+    <path d="M173 34 L186 22" stroke-width="4" stroke-dasharray="0 7"/>
+  </g>
+  <!-- yola çıkmış nokta -->
+  <circle cx="211" cy="27" r="11" fill="#E89B13"/>
+</svg>

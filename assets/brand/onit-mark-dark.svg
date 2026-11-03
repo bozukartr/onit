@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>onit</title>
+  <rect width="512" height="512" rx="112" fill="#1B1E27"/>
+  <g transform="translate(256 256) scale(1.0) translate(-822 -594)">
+    <path d="M768 597v161" fill="none" stroke="#ECE8E1" stroke-width="78" stroke-linecap="round"/>
+    <path d="M766 528Q778 476 828 452" fill="none" stroke="#ECE8E1" stroke-width="10" stroke-linecap="round" stroke-dasharray="14 24"/>
+    <circle cx="875" cy="430" r="40" fill="#E89B13"/>
+  </g>
+</svg>
