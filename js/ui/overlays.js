@@ -116,4 +116,13 @@ export function showOver(){
   $('#again').onclick=()=>{AU.click();newGame();};
   $('#toMenu').onclick=()=>{AU.click();curtain(()=>startMenu());};
 }
-export function curtain(fn){const c=$('#curtain');c.classList.add('on');setTimeout(()=>{fn();requestAnimationFrame(()=>requestAnimationFrame(()=>c.classList.remove('on')));},400);}
+/* dairesel perde: verilen noktadan (yoksa ekran ortasından) açılır, ortada kapanır */
+let curtainAt=null;
+export const setCurtainOrigin=(x,y)=>{curtainAt={x,y};};
+export function curtain(fn){
+  const c=$('#curtain'),p=curtainAt;curtainAt=null;
+  c.style.setProperty('--cx',p?p.x+'px':'50%');c.style.setProperty('--cy',p?p.y+'px':'50%');
+  c.classList.add('on');
+  setTimeout(()=>{fn();c.style.setProperty('--cx','50%');c.style.setProperty('--cy','50%');
+    setTimeout(()=>requestAnimationFrame(()=>c.classList.remove('on')),120);},470);
+}

@@ -9,7 +9,7 @@ import { KEYS, store } from '../core/storage.js';
 export const AU={c:null,m:null,on:store.get(KEYS.sound,true),
   init(){if(this.c){if(this.c.state==='suspended')this.c.resume();return;}try{const C=window.AudioContext||window.webkitAudioContext;this.c=new C();this.m=this.c.createGain();this.m.gain.value=.55;this.m.connect(this.c.destination);}catch(e){this.c=null;}},
   t(f,d=.18,type='sine',v=.07,dl=0,sl=0){
-    const c=this.c;if(!c||!this.on||(g&&g.mode==='menu'))return;
+    const c=this.c;if(!c||!this.on||(g&&g.mode==='menu'&&!this._ui))return;
     const t=c.currentTime+dl,o=c.createOscillator(),gn=c.createGain();
     o.type=type;o.frequency.setValueAtTime(f,t);if(sl)o.frequency.exponentialRampToValueAtTime(f*sl,t+d);
     gn.gain.setValueAtTime(0,t);gn.gain.linearRampToValueAtTime(v,t+.012);gn.gain.exponentialRampToValueAtTime(.0001,t+d);
@@ -31,5 +31,9 @@ export const AU={c:null,m:null,on:store.get(KEYS.sound,true),
   pickUp(){[659.25,880,1174.66].forEach((f,i)=>this.t(f,.22,'sine',.05,i*.06));},
   perfect(){[783.99,987.77,1174.66,1567.98].forEach((f,i)=>this.t(f,.3,'sine',.045,i*.08));},
   day(){[523.25,659.25,783.99,1046.5].forEach((f,i)=>this.t(f,.95,'sine',.04,i*.09));},
+  /** Menüde de çalan arayüz sesi: demo sesleri susturulmuşken düğmeler duyulur. */
+  ui(name,...args){if(typeof this[name]!=='function')return;this._ui=true;try{this[name](...args);}finally{this._ui=false;}},
+  start(){[523.25,659.25,783.99,1046.5,1318.5].forEach((f,i)=>this.t(f,.26,'triangle',.05,i*.045));this.t(196,.35,'sine',.06,0,2);},
+  poke(n){const f=[523.25,587.33,659.25,783.99,880,1046.5][n%6];this.t(f,.22,'sine',.05);this.t(f*2,.12,'sine',.015,.03);},
   over(){[392,330,262].forEach((f,i)=>this.t(f,.75,'triangle',.05,i*.2));}
 };

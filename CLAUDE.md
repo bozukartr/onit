@@ -35,12 +35,16 @@ assets/brand · icons · screenshots
 ```
 - Modüller arası paylaşılan durum `export let` canlı bağlarıyla okunur; yalnızca sahibi modül yeniden atar (`g` → state.newState, `now` → setNow, `tiles` → map.buildMap, `ovOpen` → overlays). Yan etkiler `initHUD/initInput/initMenu/initPWA` içinde, `main.js` sırayla çağırır.
 
-## Ana menü
-- Arkada gerçek simülasyon demo yapay zekâsıyla oynar (6. gün oteli); kamera `menuFreeArea()` ile panellerin dışında kalan alana sığar, çok yavaş sinematik kayma.
-- Üstte animasyonlu logo (harfler yaylanır → nokta "i"nin üstünde belirir, çömelir, kesikli iz bırakarak yerine uçar, sönümlü yayla oturur; logoya dokununca tekrar oynar). `prefers-reduced-motion` desteklenir.
-- Cam panel: ekip jetonları, "Vardiyaya başla" (turuncu nokta düğmesi), kariyer (rekor talep, en uzun gün, vardiya sayısı — `onit_stats`), Nasıl oynanır / Ses / Yükle (yalnızca yüklenebilirken; iOS'ta talimat kartı).
-- Masaüstü ve yatay telefonda sol sütun, otel sağda. Oyun içi "?" katmanından "Ana menüye dön" ile dönülebilir.
-- Kayıt varsa ana düğme **"Devam et"** olur (gün, talep, puan gösterir); altında "Yeni vardiya başlat" iki dokunuşla onaylanır (kayıt silinir).
+## Ana menü (oyun başlık ekranı)
+- Kullanıcı isteği: menü **web sayfası gibi değil, gerçek bir oyun giriş ekranı** gibi olmalı. Cam kart, istatistik kutuları, metin düğme satırı ve altbilgi bu yüzden kaldırıldı; geri getirme.
+- Arkada gerçek simülasyon demo yapay zekâsıyla oynar (6. gün oteli), tam ekran sahne gibi; kamera `menuFreeArea()` ile logo ile düğme arasına (yan yerleşimde sağ tarafa) sığar, çok yavaş sinematik kayma. Üstte/altta `--bg` renginden okunurluk perdeleri.
+- **Gün döngüsü:** menüde ~80 sn'de gündüz → gün batımı → gece → şafak (`loop.updatePalette`, `g.menuT0`); gece pencere ışıkları yanar, logo ve ikonlar CSS değişkenleriyle renk değiştirir.
+- Animasyonlu logo (harfler yaylanır → nokta "i"nin üstünde belirir, çömelir, kesikli iz bırakarak yerine uçar; logoya dokununca tekrar oynar). `prefers-reduced-motion` desteklenir.
+- Büyük 3B turuncu **"OYNA"** düğmesi (basınca çöker, nefes alır, parlama geçer); kayıt varsa **"DEVAM ET"** + "3. GÜN" çıkartması + altında gün/talep/puan; "Yeni vardiya başlat" iki dokunuşla onaylanır.
+- Üst çubuk: solda rekor kupası (rekor + en uzun gün, rekor yoksa gizli), sağda yuvarlak ikonlar: Yükle (yalnızca yüklenebilirken; iOS'ta talimat kartı), Ses, Nasıl oynanır.
+- Menüde **arayüz sesleri çalar** (`AU.ui(name)`; demo sesleri yine sessiz). Otele dokununca renkli dalga + nota (`input.menuPoke`).
+- Oyuna geçiş: düğmeden açılan **dairesel perde** (`overlays.curtain` + `setCurtainOrigin`), ortasında turuncu nokta; menüye dönüş de aynı perdeyle.
+- Yerleşim: dikey telefonda logo üstte, düğme altta, otel ortada; geniş ekran (≥900px, yatay oran) ve yatay telefonda logo + düğme solda, otel sağda büyük. Oyun içi "?" katmanından "Ana menüye dön" ile dönülebilir.
 
 ## Kayıt (game/save.js, `onit_save`)
 - Otomatik kontrol noktaları: **her gün başı** (`startDay` sonunda, geliştirme uygulanmış) ve **gün sonu özeti** (aynı olay + aynı 3 geliştirme seçeneği saklanır).
