@@ -177,6 +177,20 @@ export function pickFor(team,idleOnly){
   const home=mine.filter(s=>s.state==='move'&&s.leg&&s.leg.kind==='base').sort((a,b)=>(a.leg.len-a.leg.s)-(b.leg.len-b.leg.s));
   return home[0]||null;
 }
+/**
+ * Departman karesi / ekip kartından gönderim için personel seçer.
+ * Sıra: boştaki → üsse dönen → rotası olan ve sırasında yer bulunan (en kısa sıra).
+ * Herkesin sırası doluysa yine en kısa sıralıyı döndürür; çağıran `full` ile uyarır.
+ * @returns {{st:object|null, full:boolean}}
+ */
+export function pickDispatch(team){
+  const free=pickFor(team);if(free)return{st:free,full:false};
+  const busy=g.staff.filter(s=>s.team===team&&now>s.pop&&busyPlan(s))
+    .sort((a,b)=>queueRooms(a).length-queueRooms(b).length||a.id-b.id);
+  if(!busy.length)return{st:null,full:false};
+  const open=busy.find(s=>queueRooms(s).length<g.maxStops);
+  return open?{st:open,full:false}:{st:busy[0],full:true};
+}
 export function computeAssign(){
   for(const r of g.rooms)for(const q of r.requests)q.assigned=null;
   for(const st of g.staff)if(st.serve)st.serve.req.assigned=st;

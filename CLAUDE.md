@@ -25,7 +25,7 @@ css/  base · hud · menu · overlays · responsive
 js/main.js              giriş noktası + ana döngü
 js/core/                utils (matematik/renk/DOM), config (sabitler, ekipler), storage (localStorage, onit_* anahtarları)
 js/world/               map (tile haritası, BFS), route (yumuşak rota geometrisi)
-js/game/                state (g, now, fx), staff, requests, guests, demo, day, upgrades, tutorial, flow, loop
+js/game/                state (g, now, fx), staff, requests, guests, demo, day, upgrades, tutorial, flow, loop, save (vardiya kaydı)
 js/render/              viewport (canvas+kamera), palette, shapes, effects, routes, tiles, actors, renderer
 js/ui/                  hud, overlays, menu (ana menü), logo (vektör logo + açılış animasyonu)
 js/input/input.js       sürükle-bırak / dokun-seç
@@ -39,7 +39,14 @@ assets/brand · icons · screenshots
 - Arkada gerçek simülasyon demo yapay zekâsıyla oynar (6. gün oteli); kamera `menuFreeArea()` ile panellerin dışında kalan alana sığar, çok yavaş sinematik kayma.
 - Üstte animasyonlu logo (harfler yaylanır → nokta "i"nin üstünde belirir, çömelir, kesikli iz bırakarak yerine uçar, sönümlü yayla oturur; logoya dokununca tekrar oynar). `prefers-reduced-motion` desteklenir.
 - Cam panel: ekip jetonları, "Vardiyaya başla" (turuncu nokta düğmesi), kariyer (rekor talep, en uzun gün, vardiya sayısı — `onit_stats`), Nasıl oynanır / Ses / Yükle (yalnızca yüklenebilirken; iOS'ta talimat kartı).
-- Masaüstü ve yatay telefonda sol sütun, otel sağda. Oyun içi "?" katmanından "Vardiyayı bırak · ana menü" ile dönülebilir.
+- Masaüstü ve yatay telefonda sol sütun, otel sağda. Oyun içi "?" katmanından "Ana menüye dön" ile dönülebilir.
+- Kayıt varsa ana düğme **"Devam et"** olur (gün, talep, puan gösterir); altında "Yeni vardiya başlat" iki dokunuşla onaylanır (kayıt silinir).
+
+## Kayıt (game/save.js, `onit_save`)
+- Otomatik kontrol noktaları: **her gün başı** (`startDay` sonunda, geliştirme uygulanmış) ve **gün sonu özeti** (aynı olay + aynı 3 geliştirme seçeneği saklanır).
+- Gün ortasında çıkılırsa/uygulama kapanırsa o **günün başından** devam edilir (rotalar ve talepler kaydedilmez — bilinçli tercih).
+- Kaydedilenler: gün, puan, skor, şikayet, ekip başına personel sayısı, geliştirmeler (maxStops, owned, spd, trn, pat), görülmüş ipuçları, hız, günün olayı, `runBest`.
+- Oyun bitince kayıt silinir; rekor/en uzun gün kontrol noktalarında da güncellenir. `?action=play` kısayolu kayıt varsa devam eder.
 
 ## Oynanış
 - **Harita:** 11×15 tile ızgara. Lobi altta, merkez omurga koridoru, katlar halinde yatay koridorlar, iki yanda odalar. Her gün yeni kanat açılır (koridorlar çizilerek, odalar yaylanarak belirir, kamera uzaklaşır). 6. günde 37 oda.
@@ -53,6 +60,7 @@ assets/brand · icons · screenshots
   | Güvenlik | beşgen | #8656B8 | 5. gün |
   | Joker (geliştirme) | yıldız | #DB5A96 | her talebe bakar, %30 yavaş |
 - **Kontroller:**
+  - **Departman karesinden / ekip kartından yönlendirme her zaman açık** (kullanıcının isteği): boşta personel → üsse dönen → rotası olan ve sırasında yer bulunan (en kısa sıra) personel seçilir; çizgi onun kuyruğunun sonuna eklenir (`staff.pickDispatch`). Herkesin sırası doluysa uyarı verilir. Departmandan başlayan sürükleme yine departmana bırakılırsa vazgeçilmiş sayılır (rota iptal edilmez).
   - Personeli (haritadan, üssünden ya da alttaki ekip kartından) odaya sürükle. Bırakmadan birkaç odadan geçersen çok duraklı rota olur. Talebi uyan oda anında eklenir; diğerleri kısa bekleme (dwell) ya da üstünde bırakma ile.
   - **Yoldaki personeli sürükle → yeni duraklar rotanın SONUNA eklenir** (kullanıcının özel isteği). Rotanın son durağından çekmek de aynı.
   - Personele **dokun → seçilir**, sonra odalara dokunarak sıraya eklenir; boşa dokununca seçim kalkar.

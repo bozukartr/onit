@@ -23,9 +23,9 @@
   ],
   "shortcuts": [
     {
-      "name": "Yeni vardiya",
+      "name": "Oyna",
       "short_name": "Oyna",
-      "description": "Menüyü atlayıp doğrudan yeni bir vardiya başlat",
+      "description": "Menüyü atlayıp kaldığın vardiyaya devam et (yoksa yeni vardiya)",
       "url": "./?action=play",
       "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }

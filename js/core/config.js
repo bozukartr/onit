@@ -11,7 +11,7 @@ export const LANE=.085;              // ekip şeritleri arası
 export const FAIL_AT=2.5;
 export const DWELL=.34;
 export const FONT='"Avenir Next",Avenir,"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif';
-const DAY_NAMES=['Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar'];
+export const DAY_NAMES=['Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar'];
 export const DAY_ABBR=['PZT','SAL','ÇAR','PER','CUM','CMT','PAZ'];
 export const dayName=d=>DAY_NAMES[(d-1)%7].toLocaleUpperCase('tr-TR');
 

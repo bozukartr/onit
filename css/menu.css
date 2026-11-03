@@ -63,6 +63,13 @@ body.menu #top *,body.menu #teams *{pointer-events:none!important}
 .m-play-arr{flex:none;width:20px;height:20px;opacity:.5;transition:transform .3s cubic-bezier(.2,1.6,.4,1),opacity .3s}
 .m-play:hover .m-play-arr{transform:translateX(4px);opacity:.9}
 
+/* kayıt varken: yeni vardiya (iki dokunuşla onay) */
+.m-new{align-self:center;margin:-4px 0 -2px;padding:6px 12px;border:0;border-radius:999px;background:none;color:#8F887C;
+  font-size:12px;font-weight:700;cursor:pointer;transition:color .2s,background-color .2s}
+.m-new:hover{color:#26282E}
+.m-new.warn{background:#FCE4E0;color:#C0392B}
+.m-new[hidden]{display:none}
+
 /* kariyer */
 .m-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
 .m-stats div{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 4px 8px;border-radius:16px;background:rgba(243,238,228,.9)}

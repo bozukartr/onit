@@ -9,10 +9,11 @@
  * bölgeye sığdırılır.
  */
 import { AU } from '../audio/audio.js';
-import { REQ, TEAMS } from '../core/config.js';
+import { DAY_NAMES, REQ, TEAMS } from '../core/config.js';
 import { KEYS, store } from '../core/storage.js';
-import { $, clamp, eOut } from '../core/utils.js';
-import { newGame } from '../game/flow.js';
+import { $, clamp, eOut, fmt1 } from '../core/utils.js';
+import { continueGame, newGame } from '../game/flow.js';
+import { loadSave } from '../game/save.js';
 import { canInstall, isIOS, onPWA, promptInstall, applyUpdate } from '../pwa/pwa.js';
 import { shapeSVG } from '../render/shapes.js';
 import { muteIcon } from './hud.js';
@@ -66,8 +67,32 @@ function refreshStats() {
     countTo(ui.day, Math.max(best.day || 0, st.days || 0), 1000);
     countTo(ui.shifts, st.shifts || 0, 1100);
   }
-  const tutDone = store.get(KEYS.tutorial, 0) >= 2;
-  ui.playSub.textContent = tutDone ? '1. gün · Pazartesi 07:00' : 'Kısa bir eğitimle başlar';
+  const save = loadSave();
+  ui.newRun.hidden = !save; resetNewRun();
+  if (save) {
+    ui.playTitle.textContent = 'Devam et';
+    ui.playSub.textContent = save.at === 'summary'
+      ? `${save.day}. gün sonu · ${save.score} talep · ${fmt1(save.rating)}★`
+      : `${save.day}. gün · ${DAY_NAMES[(save.day - 1) % 7]} · ${save.score} talep · ${fmt1(save.rating)}★`;
+  } else {
+    const tutDone = store.get(KEYS.tutorial, 0) >= 2;
+    ui.playTitle.textContent = 'Vardiyaya başla';
+    ui.playSub.textContent = tutDone ? '1. gün · Pazartesi 07:00' : 'Kısa bir eğitimle başlar';
+  }
+}
+
+/* "Yeni vardiya" iki dokunuşla onaylanır: kayıtlı vardiya silinir */
+let newRunTO = 0;
+function resetNewRun() {
+  clearTimeout(newRunTO);
+  ui.newRun.classList.remove('warn');
+  ui.newRun.textContent = 'Yeni vardiya başlat';
+}
+function startRun(fn) {
+  if (leaving) return; leaving = true;
+  AU.init(); AU.click();
+  root.classList.add('m-out');
+  fn();
 }
 
 function refreshSound() {
@@ -103,11 +128,15 @@ function buildTeams() {
 
 function bind() {
   if (bound) return; bound = true;
-  ui.play.addEventListener('click', () => {
-    if (leaving) return; leaving = true;
-    AU.init(); AU.click();
-    root.classList.add('m-out');
-    newGame();
+  ui.play.addEventListener('click', () => startRun(loadSave() ? continueGame : newGame));
+  ui.newRun.addEventListener('click', () => {
+    if (!ui.newRun.classList.contains('warn')) {
+      ui.newRun.classList.add('warn');
+      ui.newRun.textContent = 'Emin misin? Kayıtlı vardiya silinecek · tekrar dokun';
+      clearTimeout(newRunTO); newRunTO = setTimeout(resetNewRun, 3500);
+      return;
+    }
+    resetNewRun(); startRun(newGame);
   });
   ui.how.addEventListener('click', () => { AU.init(); AU.click(); showHelp({ fromMenu: true }); });
   ui.sound.addEventListener('click', () => {
@@ -137,7 +166,7 @@ export function initMenu() {
   root = $('#menu');
   ui = {
     col: $('#menu .m-col'), head: $('#menu .m-head'), panel: $('#mPanel'), logo: $('#mLogo'),
-    teams: $('#mTeams'), play: $('#mPlay'), playSub: $('#mPlaySub'), how: $('#mHow'), sound: $('#mSound'),
+    teams: $('#mTeams'), play: $('#mPlay'), playSub: $('#mPlaySub'), playTitle: $('#mPlayTitle'), newRun: $('#mNew'), how: $('#mHow'), sound: $('#mSound'),
     install: $('#mInstall'), stats: $('#menu .m-stats'), update: $('#mUpdate'), best: $('#msBest'), day: $('#msDay'), shifts: $('#msShifts'),
   };
   ui.logo.innerHTML = logoSVG({ animated: true }) + '<span class="sr">onit</span>';

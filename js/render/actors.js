@@ -71,7 +71,7 @@ export function drawDrag(){
   const t=tileAtW(d.w);let tx=d.w.x,ty=d.w.y;
   if(t&&t.type==='room'&&t.unlocked){tx=lerp(d.w.x,t.x+.5,.55);ty=lerp(d.w.y,t.y+.5,.55);}
   const k=1-Math.exp(-g.rdt*22);d.mx+=(tx-d.mx)*k;d.my+=(ty-d.my)*k;
-  const overBase=t===d.staff.base&&!d.stops.length&&busyPlan(d.staff);
+  const overBase=t===d.staff.base&&!d.stops.length&&busyPlan(d.staff)&&!d.fromBase;
   ctx.save();ctx.globalAlpha=.55;ctx.setLineDash([.12,.12]);ctx.lineDashOffset=-now*.8;
   ctx.strokeStyle=overBase?'#8F887C':tc.color;ctx.lineWidth=.07;ctx.beginPath();ctx.moveTo(lastPt.x,lastPt.y);
   const mx=(lastPt.x+d.mx)/2,my=(lastPt.y+d.my)/2-.12;ctx.quadraticCurveTo(mx,my,d.mx,d.my);ctx.stroke();ctx.restore();

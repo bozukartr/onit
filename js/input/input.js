@@ -5,7 +5,7 @@
 import { AU } from '../audio/audio.js';
 import { TEAMS } from '../core/config.js';
 import { haptic } from '../core/utils.js';
-import { appendPlan, busyPlan, cancelRoute, commitPlan, laneOf, lastStopOf, pickFor, planLegs, queueRooms } from '../game/staff.js';
+import { appendPlan, busyPlan, cancelRoute, commitPlan, laneOf, lastStopOf, pickDispatch, planLegs, queueRooms } from '../game/staff.js';
 import { fx, g, matches, now } from '../game/state.js';
 import { tok } from '../render/shapes.js';
 import { cam, cv, toWorld } from '../render/viewport.js';
@@ -27,10 +27,10 @@ function hitRouteEnd(w){
   return best;
 }
 export const tileAtW=w=>at(Math.floor(w.x),Math.floor(w.y));
-export function beginDrag(st,e){
+export function beginDrag(st,e,opt={}){
   const w=toWorld(e.clientX,e.clientY);
   const mode=busyPlan(st)?'append':'new';
-  g.drag={staff:st,team:st.team,mode,from:mode==='append'?lastStopOf(st):null,stops:[],pid:e.pointerId,w,sx:e.clientX,sy:e.clientY,moved:0,pv:null,full:false,hover:null,mx:w.x,my:w.y,t0:now};
+  g.drag={staff:st,team:st.team,mode,from:mode==='append'?lastStopOf(st):null,stops:[],pid:e.pointerId,w,sx:e.clientX,sy:e.clientY,moved:0,pv:null,full:false,hover:null,mx:w.x,my:w.y,t0:now,fromBase:!!opt.fromBase};
   cv.style.cursor='grabbing';AU.pick(st.team);haptic(6);
   if(g.guideOn&&st.team==='H')g.guideFade=now;
 }
@@ -79,9 +79,14 @@ function commitDrag(){
   g.drag=null;cv.style.cursor='';
   const st=d.staff;
   if(!d.stops.length){
-    if(d.moved<10&&now-d.t0<.6){toggleSelect(st);return;}
+    if(d.moved<10&&now-d.t0<.6){
+      /* seçili + rotalı personelin üssüne dokunmak rotayı iptal eder */
+      if(d.fromBase&&d.cancelOnTap){cancelRoute(st);deselect();return;}
+      toggleSelect(st);return;
+    }
     const t=tileAtW(d.w);
-    if(t===st.base&&busyPlan(st)){cancelRoute(st);return;}
+    /* departmandan başlayan sürükleme üsse geri bırakılırsa: vazgeçildi, rota iptal edilmez */
+    if(t===st.base&&busyPlan(st)&&!d.fromBase){cancelRoute(st);return;}
     if(d.moved<12)hint('Personeli <b>sürükle</b> ve talebi olan bir odanın üstünde bırak — ya da dokunup seç.',3000);
     return;
   }
@@ -123,10 +128,15 @@ export function initInput(){
     const t=tileAtW(w);
     if(g.sel&&t&&t.type==='room'&&t.unlocked&&now>t.appear+.3){tapAppend(g.sel,t);return;}
     if(t&&t.type==='dept'&&t.unlocked){
-      if(g.sel&&g.sel.base===t&&busyPlan(g.sel)){cancelRoute(g.sel);deselect();return;}
-      const p=pickFor(t.team);
-      if(!p){t.shake=1;AU.no();hint('Bu ekipte boşta personel yok. Yoldaki personeli tutup sırasına durak ekleyebilirsin.',3500);return;}
-      e.preventDefault();beginDrag(p,e);return;
+      /* departmandan yönlendirme her zaman açık: boşta kimse yoksa çizgi,
+         işi olan personelin kuyruğunun sonuna eklenir */
+      const selHere=g.sel&&g.sel.base===t&&busyPlan(g.sel);
+      const pk=selHere?{st:g.sel,full:queueRooms(g.sel).length>=g.maxStops}:pickDispatch(t.team);
+      if(!pk.st){t.shake=1;AU.no();return;}
+      if(pk.full)hint(`${tok(t.team,18)} ekibinde herkesin sırası dolu (en fazla <b>${g.maxStops}</b> oda). Bir oda bitince yer açılır.`,3200);
+      e.preventDefault();beginDrag(pk.st,e,{fromBase:true});
+      if(selHere)g.drag.cancelOnTap=true;
+      return;
     }
     const re=hitRouteEnd(w);
     if(re){e.preventDefault();beginDrag(re,e);return;}

@@ -7,11 +7,11 @@ import { DAY_ABBR, ORDER, TEAMS } from '../core/config.js';
 import { KEYS, store } from '../core/storage.js';
 import { $, TAU, fmt1, lerp, rgba } from '../core/utils.js';
 import { hourNow } from '../game/requests.js';
-import { busyPlan, pickFor, queueRooms } from '../game/staff.js';
+import { pickDispatch } from '../game/staff.js';
 import { fx, g, teamUnlocked } from '../game/state.js';
 import { beginDrag, canDrag, deselect } from '../input/input.js';
 import { pal } from '../render/palette.js';
-import { shapeSVG } from '../render/shapes.js';
+import { shapeSVG, tok } from '../render/shapes.js';
 import { ovOpen, showHelp } from './overlays.js';
 
 export const el={score:$('#score'),rating:$('#rating'),rfill:$('#rfill'),rbox:$('#ratingBox'),hand:$('#cHand'),prog:$('#cProg'),night:$('#cNight'),cday:$('#cDay'),ctime:$('#cTime'),teams:$('#teams'),hint:$('#hint'),banner:$('#banner'),bT:$('#bTitle'),bS:$('#bSub'),pause:$('#pausePill'),toast:$('#toast'),combo:$('#combo'),comboTx:$('#comboTx')};
@@ -40,11 +40,10 @@ export function ensureChips(){
     c.innerHTML=`<div class="tk" style="background:${TEAMS[k].color}">${shapeSVG(TEAMS[k].shape,'#fff',15,12)}<span class="bd">0/0</span></div><div class="nm">${TEAMS[k].name}</div>`;
     c.addEventListener('pointerdown',ev=>{
       ev.preventDefault();AU.init();if(!canDrag())return;
-      let st=pickFor(k);
-      if(!st&&g.sel&&g.sel.team===k)st=g.sel;
-      if(!st){const busy=g.staff.filter(s=>s.team===k&&busyPlan(s)).sort((a,b)=>queueRooms(a).length-queueRooms(b).length)[0];st=busy||null;}
-      if(!st){c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');AU.no();return;}
-      beginDrag(st,ev);
+      const pk=pickDispatch(k);
+      if(!pk.st){c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');AU.no();return;}
+      if(pk.full)hint(`${tok(k,18)} ekibinde herkesin sırası dolu (en fazla <b>${g.maxStops}</b> oda). Bir oda bitince yer açılır.`,3200);
+      beginDrag(pk.st,ev);
     });
     const nextEl=[...el.teams.children].find(o=>ORDER.indexOf(o.dataset.team)>ORDER.indexOf(k));
     el.teams.insertBefore(c,nextEl||null);

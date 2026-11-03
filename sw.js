@@ -11,7 +11,7 @@
  *
  * Yayın yaparken VERSION değerini artırın (scripts/check-precache.mjs listeyi doğrular).
  */
-const VERSION = '1.0.0';
+const VERSION = '1.1.0';
 const CACHE = `onit-${VERSION}`;
 
 const PRECACHE = [
@@ -34,6 +34,7 @@ const PRECACHE = [
   './js/game/guests.js',
   './js/game/loop.js',
   './js/game/requests.js',
+  './js/game/save.js',
   './js/game/staff.js',
   './js/game/state.js',
   './js/game/tutorial.js',
