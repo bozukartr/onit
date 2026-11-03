@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="220 380 812 428" width="812" height="428">
+  <title>onit — koyu tema</title>
+  <g fill="none" stroke="#ECE8E1" stroke-width="78" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="356" cy="672" r="86"/>
+    <path d="M530 758V660a71 71 0 0 1 142 0v98"/>
+    <path d="M768 597v161"/>
+    <path d="M887 546v142a70 70 0 0 0 70 70q14 0 26-6"/>
+    <path d="M855 598h127"/>
+  </g>
+  <path d="M766 528Q778 476 828 452" fill="none" stroke="#ECE8E1" stroke-width="10" stroke-linecap="round" stroke-dasharray="14 24"/>
+  <circle cx="875" cy="430" r="40" fill="#E89B13"/>
+</svg>

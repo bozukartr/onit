@@ -1,0 +1,21 @@
+/* onit — css/responsive.css
+   Küçük ekran, tablet/masaüstü ve yatay telefon uyarlamaları. */
+
+@media (max-width:380px){
+  .btn{width:30px;height:30px}.btn.sm{width:26px;height:26px}
+  #clock{width:50px;height:50px}.score{font-size:27px}
+  .chip{width:56px}.chip .nm{font-size:9.5px}
+  .card{padding:22px 16px 18px}
+  .up{padding:11px 5px 10px}.up h4{font-size:11.5px}.up p{font-size:10.5px}
+}
+@media (min-width:700px){
+  .chip{width:76px}.chip .nm{font-size:11.5px}
+}
+@media (max-height:500px) and (orientation:landscape){
+  #top{padding-top:calc(env(safe-area-inset-top,0px) + 8px)}
+  .score{font-size:24px}#clock{width:44px;height:44px}.btn{width:30px;height:30px}.btn.sm{width:26px;height:26px}
+  .chip{width:50px;padding:7px 0;border-radius:16px}.chip .nm{display:none}
+  #teams{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
+  #hint{bottom:calc(env(safe-area-inset-bottom,0px) + 66px)}
+  #banner,.pill{top:calc(env(safe-area-inset-top,0px) + 70px)}
+}
