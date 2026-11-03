@@ -9,7 +9,8 @@ import { $, clamp, eOut, fmt1, rnd } from '../core/utils.js';
 import { chooseEvent, dayInfo, startDay } from '../game/day.js';
 import { newGame, startMenu } from '../game/flow.js';
 import { g, teamUnlocked } from '../game/state.js';
-import { genChoices } from '../game/upgrades.js';
+import { describeUpg, genPicks } from '../game/upgrades.js';
+import { clearSave, saveCheckpoint } from '../game/save.js';
 import { rq, tok } from '../render/shapes.js';
 import { hud } from './hud.js';
 
@@ -46,18 +47,21 @@ export function showHelp({fromMenu=false}={}){
   const inRun=!fromMenu&&g&&g.mode==='play';
   openOv(`<div class="card"><div class="eyebrow">NASIL OYNANIR</div>${howHTML()}
     <button class="cta" id="resume">${fromMenu?'Anladım':'Devam et'}</button>
-    ${inRun?'<button class="ghostbtn" id="quit">Vardiyayı bırak · ana menü</button>':''}
+    ${inRun?'<button class="ghostbtn" id="quit">Ana menüye dön · kaldığın günün başından devam edersin</button>':''}
     ${fromMenu&&store.get(KEYS.tutorial,0)>=2?'<button class="ghostbtn" id="retut">Eğitimi yeniden oynat</button>':''}
   </div>`);
   $('#resume').onclick=()=>{AU.click();closeOv();};
-  const q=$('#quit');if(q)q.onclick=()=>{AU.click();recordShift({served:g.score,days:g.day-1});closeOv();curtain(()=>startMenu());};
+  const q=$('#quit');if(q)q.onclick=()=>{AU.click();closeOv();curtain(()=>startMenu());};
   const r=$('#retut');if(r)r.onclick=()=>{store.set(KEYS.tutorial,0);r.textContent='Eğitim bir sonraki vardiyada oynanacak ✓';r.disabled=true;};
 }
 export function showSummary(){
   if(!g||g.phase!=='night')return;
   const d=g.day,S=g.dayStats,dr=g.rating-S.r0;
-  g.nextEvent=chooseEvent(d+1);
-  const ch=genChoices();
+  /* kayıttan dönülüyorsa aynı olay + aynı seçenekler */
+  const plan=g.summaryPlan||{nextEvent:chooseEvent(d+1),picks:genPicks()};g.summaryPlan=null;
+  g.nextEvent=plan.nextEvent;
+  const ch=plan.picks.map(describeUpg);
+  saveCheckpoint('summary',{dayStats:S,nextEvent:plan.nextEvent?plan.nextEvent.name:null,picks:plan.picks});
   const perfect=S.complaints===0&&S.served>=5;
   const row=ORDER.filter(k=>teamUnlocked(k)).map(k=>`<div class="tm">${tok(k,20)}<b>${S.byTeam[k]||0}</b></div>`).join('');
   const ev=g.nextEvent?`<div class="evt"><b>${g.nextEvent.name}</b> · ${g.nextEvent.desc}</div>`:'';
@@ -89,10 +93,12 @@ export function showSummary(){
   }));
 }
 export function showOver(){
-  const best=store.get(KEYS.best,{score:0,day:0});
+  clearSave();
   recordShift({served:g.score,days:g.day});
-  const isBest=g.score>(best.score||0);
-  if(isBest)store.set(KEYS.best,{score:g.score,day:g.day});
+  const best=store.get(KEYS.best,{score:0,day:0});
+  /* rekor: bu vardiya başlamadan önceki en iyi skordan yüksekse */
+  const isBest=g.score>(g.runBest||0);
+  if(g.score>(best.score||0))store.set(KEYS.best,{score:g.score,day:g.day});
   openOv(`<div class="card over">${isBest&&g.score>0?confettiHTML(36):''}
     <div class="eyebrow">${dayName(g.day)} · ${g.day}. GÜN · ${hud.ts||''}</div>
     <h2>Vardiya sona erdi</h2>
@@ -102,7 +108,7 @@ export function showOver(){
       <div><b data-to="${g.score}">0</b><span>talep</span></div>
       <div><b data-to="${g.complaints}">0</b><span>şikayet</span></div>
     </div>
-    ${isBest&&g.score>0?'<div class="nb">YENİ REKOR</div>':best.score?`<div class="best">En iyi: <b>${best.score}</b> talep · ${best.day}. gün</div>`:''}
+    ${isBest&&g.score>0?'<div class="nb">YENİ REKOR</div>':best.score?`<div class="best">En iyi: <b>${Math.max(best.score,g.score)}</b> talep · ${best.day}. gün</div>`:''}
     <button class="cta" id="again">Yeni vardiya</button>
     <button class="ghostbtn" id="toMenu">Ana menü</button>
   </div>`);

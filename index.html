@@ -93,9 +93,10 @@
       <ul class="m-teams" id="mTeams" aria-label="Ekipler" style="--d:0s"></ul>
       <button class="m-play" id="mPlay" style="--d:.06s">
         <span class="m-play-dot" aria-hidden="true"><svg viewBox="0 0 18 18"><path d="M5 3.2v11.6a.8.8 0 0 0 1.2.7l9.2-5.8a.8.8 0 0 0 0-1.4L6.2 2.5a.8.8 0 0 0-1.2.7z" fill="#fff"/></svg></span>
-        <span class="m-play-tx"><b>Vardiyaya başla</b><small id="mPlaySub">1. gün · Pazartesi 07:00</small></span>
+        <span class="m-play-tx"><b id="mPlayTitle">Vardiyaya başla</b><small id="mPlaySub">1. gün · Pazartesi 07:00</small></span>
         <svg class="m-play-arr" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
+      <button class="m-new" id="mNew" hidden style="--d:.09s">Yeni vardiya başlat</button>
       <div class="m-stats" style="--d:.12s" aria-label="Kariyer">
         <div class="gold"><b id="msBest">—</b><span>Rekor</span></div>
         <div><b id="msDay">—</b><span>En uzun gün</span></div>

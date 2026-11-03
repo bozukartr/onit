@@ -14,7 +14,7 @@
  */
 import { migrateLegacyKeys } from './core/storage.js';
 import { endDay, startDay } from './game/day.js';
-import { newGame, startMenu } from './game/flow.js';
+import { continueGame, startMenu } from './game/flow.js';
 import { step, updatePalette, visuals } from './game/loop.js';
 import { spawnReq } from './game/requests.js';
 import { appendPlan, busyPlan, cancelRoute, commitPlan, computeAssign, pickFor, queueRooms } from './game/staff.js';
@@ -30,7 +30,7 @@ import { initMenu } from './ui/menu.js';
 import { ovOpen } from './ui/overlays.js';
 import { at, tiles } from './world/map.js';
 
-const VERSION = '1.0.0';
+const VERSION = '1.1.0';
 
 /* ---------- döngü ---------- */
 let last = performance.now() / 1000;
@@ -65,8 +65,8 @@ function boot() {
   initPWA();
   const ver = document.getElementById('mVer'); if (ver) ver.textContent = 'v' + VERSION;
   startMenu();
-  /* manifest kısayolu: ./?action=play → doğrudan yeni vardiya */
-  if (new URLSearchParams(location.search).get('action') === 'play') newGame();
+  /* manifest kısayolu: ./?action=play → kayıt varsa devam, yoksa yeni vardiya */
+  if (new URLSearchParams(location.search).get('action') === 'play') continueGame();
   requestAnimationFrame(frame);
   requestAnimationFrame(() => document.documentElement.classList.add('ready'));
 }

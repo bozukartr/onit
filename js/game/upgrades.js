@@ -17,7 +17,7 @@ const ICON={
   pat:()=>`<svg viewBox="0 0 44 44"><path d="M22 36s-12.5-7.6-12.5-16.4A7 7 0 0 1 22 15.2a7 7 0 0 1 12.5 4.4C34.5 28.4 22 36 22 36z" fill="#E4513F"/><path d="M15 20a4 4 0 0 1 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none" opacity=".6"/></svg>`,
   corr:s=>{const x=s==='W'?8:36;return `<svg viewBox="0 0 44 44"><path d="M8 10h28M8 22h28M8 34h28" stroke="#DCD3C3" stroke-width="5" stroke-linecap="round"/><path d="M${x} 10V34" stroke="#26282E" stroke-width="5" stroke-linecap="round"/><circle cx="22" cy="22" r="3" fill="#26282E" opacity=".25"/></svg>`;}
 };
-function describeUpg(p){
+export function describeUpg(p){
   switch(p.kind){
     case'hire':return{title:`+1 ${TEAMS[p.k].name}`,desc:`${TEAMS[p.k].long} ekibine yeni personel.`,icon:ICON.hire(p.k),apply(){addStaff(p.k,now+.35);ensureChips();}};
     case'cart':return{title:'Servis Arabası',desc:`Bir personelin sırasında ${g.maxStops+1} oda olabilir.`,icon:ICON.cart(),apply(){g.maxStops++;}};
@@ -28,7 +28,8 @@ function describeUpg(p){
     case'joker':return{title:'Çok Yönlü Eleman',desc:'Her talebe bakar ama %30 yavaş çalışır.',icon:ICON.hire('J'),apply(){g.owned.joker=true;}};
   }
 }
-export function genChoices(){
+/** Ham geliştirme seçenekleri ({kind,k?,side?}) — kayda yazılabilir. */
+export function genPicks(){
   const act=REQ.filter(k=>teamUnlocked(k)),pool=[];
   for(const k of act){const n=g.staff.filter(s=>s.team===k).length;pool.push({w:1+((g.dayStats.req[k]||0)/Math.max(1,n))*.12,kind:'hire',k});}
   if(g.maxStops<5)pool.push({w:1.1,kind:'cart'});
@@ -41,5 +42,6 @@ export function genChoices(){
     const rest=pool.filter(p=>!out.includes(p)&&!(p.kind==='corr'&&out.some(o=>o.kind==='corr'))&&!(p.kind==='hire'&&out.filter(o=>o.kind==='hire').length>=2));
     const c=wpick(rest,p=>p.w);if(!c)break;out.push(c);
   }
-  return out.filter(Boolean).map(describeUpg);
+  return out.filter(Boolean).map(({kind,k,side})=>({kind,k,side}));
 }
+export const genChoices=()=>genPicks().map(describeUpg);
