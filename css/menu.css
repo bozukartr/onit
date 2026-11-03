@@ -1,106 +1,91 @@
 /* onit — css/menu.css
-   Ana menü: animasyonlu logo, canlı otel demosu üstünde cam panel,
-   oyna düğmesi, kariyer istatistikleri, ikincil eylemler, güncelleme bildirimi. */
+   Ana menü = oyun başlık ekranı: tam ekran canlı otel sahnesi, animasyonlu logo,
+   büyük 3B "OYNA" düğmesi, köşe ikon düğmeleri, rekor kupası, güncelleme bildirimi.
+   Renkler CSS değişkenlerinden gelir; menüdeki gün→gece döngüsünde kendiliğinden uyum sağlar. */
 
 /* ---------- kapsayıcı ---------- */
 #menu{position:absolute;inset:0;pointer-events:none;z-index:2}
 body:not(.menu) #menu{visibility:hidden;transition:visibility 0s .5s}
 body.menu #top *,body.menu #teams *{pointer-events:none!important}
-.m-col{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
-  padding:calc(env(safe-area-inset-top,0px) + 30px) 16px calc(env(safe-area-inset-bottom,0px) + 12px)}
-.m-stage{flex:1;min-height:150px}
+
+/* okunurluk perdeleri: logo ve düğme arkasında sahne yumuşakça kaybolur */
+.m-veil{position:absolute;left:0;right:0;pointer-events:none;transition:opacity .6s}
+.m-veil-top{top:0;height:min(42vh,360px);background:linear-gradient(var(--bg) 0%,color-mix(in srgb,var(--bg) 82%,transparent) 45%,transparent)}
+.m-veil-bot{bottom:0;height:min(36vh,300px);background:linear-gradient(transparent,color-mix(in srgb,var(--bg) 78%,transparent) 55%,var(--bg))}
+
+/* ---------- üst çubuk: kupa + ikonlar ---------- */
+.m-bar{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:calc(env(safe-area-inset-top,0px) + 14px) 16px 0}
+.m-trophy{pointer-events:auto;display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 14px 0 9px;border-radius:999px;
+  background:var(--chip);color:var(--ink);font-size:15px;font-weight:900;font-variant-numeric:tabular-nums;
+  box-shadow:0 3px 0 rgba(40,34,24,.12),0 8px 18px rgba(40,34,24,.10)}
+.m-trophy[hidden]{display:none}
+.m-trophy svg{width:22px;height:22px;flex:none}
+.m-trophy span{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.04em}
+.m-icons{display:flex;gap:9px;margin-left:auto}
+.m-ib{pointer-events:auto;width:46px;height:46px;border:0;border-radius:50%;display:grid;place-items:center;cursor:pointer;
+  background:var(--chip);color:var(--ink);
+  box-shadow:0 4px 0 rgba(40,34,24,.14),0 10px 20px rgba(40,34,24,.10),inset 0 1px 0 rgba(255,255,255,.6);
+  transition:transform .18s cubic-bezier(.2,1.6,.4,1),box-shadow .18s,background-color .4s,color .4s}
+.m-ib svg{width:20px;height:20px;display:block}
+.m-ib .m-ic{display:grid;place-items:center}
+.m-ib:hover{transform:translateY(-2px)}
+.m-ib:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(40,34,24,.14),0 4px 10px rgba(40,34,24,.10)}
+.m-ib[hidden]{display:none}
+.m-ib-install{background:#E89B13;color:#fff;box-shadow:0 4px 0 #B86F00,0 10px 20px rgba(184,111,0,.3)}
+.m-ib.off{color:var(--muted)}
 
 /* ---------- logo + slogan ---------- */
+.m-col{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  padding:calc(env(safe-area-inset-top,0px) + 74px) 16px calc(env(safe-area-inset-bottom,0px) + 26px)}
+.m-stage{flex:1;min-height:120px}
 .m-head{pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
-.m-logo{width:min(60vw,272px);margin:0;color:var(--ink);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.m-logo{width:min(70vw,340px);margin:0;color:var(--ink);cursor:pointer;transition:color .4s;filter:drop-shadow(0 6px 0 color-mix(in srgb,var(--bg) 60%,transparent))}
 .onit-logo{display:block;width:100%;height:auto;overflow:visible}
-.onit-logo .lg-dot{filter:drop-shadow(0 6px 10px rgba(232,155,19,.35))}
+.onit-logo .lg-dot{filter:drop-shadow(0 6px 10px rgba(232,155,19,.4))}
 .lg-anim .lg-l{transform-box:fill-box;transform-origin:50% 100%;opacity:0}
 .lg-in .lg-l{animation:lgLetter .72s cubic-bezier(.2,1.55,.4,1) calc(var(--i)*85ms + 80ms) both}
 .lg-done .lg-dot{animation:lgFloat 3.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
 @keyframes lgLetter{0%{opacity:0;transform:translateY(90px) scale(.55,.4)}55%{opacity:1}100%{opacity:1;transform:none}}
 @keyframes lgFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
 
-.m-tag{display:flex;align-items:center;gap:10px;font-size:11px;font-weight:800;letter-spacing:.24em;color:var(--muted);text-transform:uppercase;white-space:nowrap}
-.m-tag::before,.m-tag::after{content:"";width:5px;height:5px;border-radius:50%;background:#E89B13;opacity:.9}
+.m-tag{display:flex;align-items:center;gap:10px;font-size:11.5px;font-weight:900;letter-spacing:.26em;color:var(--muted);text-transform:uppercase;white-space:nowrap;transition:color .4s}
+.m-tag::before,.m-tag::after{content:"";width:6px;height:6px;border-radius:50%;background:#E89B13}
 
-/* ---------- cam panel ---------- */
-.m-panel{pointer-events:auto;position:relative;width:100%;max-width:420px;padding:14px 14px 12px;border-radius:30px;
-  background:rgba(252,250,246,.82);border:1px solid rgba(255,255,255,.75);
-  -webkit-backdrop-filter:blur(18px) saturate(1.35);backdrop-filter:blur(18px) saturate(1.35);
-  box-shadow:0 30px 70px rgba(40,34,24,.18),0 6px 18px rgba(40,34,24,.07),inset 0 1px 0 rgba(255,255,255,.9);
-  display:flex;flex-direction:column;gap:11px}
+/* ---------- ana eylem ---------- */
+.m-cta{pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:12px}
+.m-play{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:14px;min-width:min(78vw,300px);height:78px;padding:0 44px;
+  border:0;border-radius:999px;cursor:pointer;color:#fff;
+  background:linear-gradient(180deg,#F7BC45 0%,#EDA21C 48%,#E3900B 100%);
+  font-size:28px;font-weight:900;letter-spacing:.16em;text-shadow:0 2px 0 rgba(160,90,0,.45);
+  box-shadow:0 8px 0 #B86F00,0 20px 34px rgba(184,111,0,.38),inset 0 2px 0 rgba(255,255,255,.55),inset 0 -4px 0 rgba(150,80,0,.18);
+  transition:transform .14s cubic-bezier(.3,1.6,.5,1),box-shadow .14s;animation:mBreath 2.6s ease-in-out 2s infinite}
+.m-play::before{content:"";position:absolute;left:10%;right:10%;top:6px;height:34%;border-radius:999px;background:linear-gradient(rgba(255,255,255,.5),rgba(255,255,255,0));pointer-events:none}
+.m-play::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.38) 50%,transparent 65%) -150% 0/250% 100% no-repeat;animation:mShine 3.8s ease-in-out 2.4s infinite}
+.m-play:hover{transform:translateY(-2px) scale(1.02)}
+.m-play:active,.m-play.press{animation:none;transform:translateY(7px) scale(.985);
+  box-shadow:0 1px 0 #B86F00,0 6px 14px rgba(184,111,0,.3),inset 0 2px 0 rgba(255,255,255,.5),inset 0 -2px 0 rgba(150,80,0,.18)}
+.m-play-ic{width:26px;height:26px;filter:drop-shadow(0 2px 0 rgba(160,90,0,.45))}
+@keyframes mBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+@keyframes mShine{0%{background-position:-150% 0}35%,100%{background-position:250% 0}}
 
-/* ekip jetonları: talep şekli → ekip */
-.m-teams{list-style:none;display:flex;justify-content:space-between;gap:4px;padding:2px 4px 0}
-.m-teams li{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0}
-.m-tk{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--c);
-  box-shadow:inset 0 -3px 0 rgba(0,0,0,.16),0 4px 10px color-mix(in srgb,var(--c) 35%,transparent);
-  animation:mBob 2.6s ease-in-out calc(var(--i)*-.32s) infinite}
-.m-tk svg{display:block}
-.m-tn{font-size:10px;font-weight:700;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-@keyframes mBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+/* kayıt etiketi: düğmeye yapışık "çıkartma" */
+.m-badge{position:absolute;right:-8px;top:-14px;padding:5px 11px;border-radius:12px;background:#26282E;color:#FCFAF6;
+  font-size:12px;font-weight:900;letter-spacing:.1em;text-shadow:none;transform:rotate(6deg);
+  box-shadow:0 4px 0 rgba(0,0,0,.25);animation:mBadge 2.6s ease-in-out infinite}
+.m-badge[hidden]{display:none}
+@keyframes mBadge{0%,100%{transform:rotate(6deg)}50%{transform:rotate(1deg) translateY(-2px)}}
 
-/* ana eylem */
-.m-play{position:relative;overflow:hidden;display:flex;align-items:center;gap:13px;width:100%;min-height:68px;padding:10px 18px 10px 12px;
-  border:0;border-radius:22px;background:#26282E;color:#FCFAF6;text-align:left;cursor:pointer;
-  box-shadow:0 14px 30px rgba(38,40,46,.32),inset 0 -4px 0 rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.08);
-  transition:transform .25s cubic-bezier(.2,1.5,.4,1),box-shadow .25s}
-.m-play:hover{transform:translateY(-2px);box-shadow:0 18px 36px rgba(38,40,46,.36),inset 0 -4px 0 rgba(0,0,0,.28)}
-.m-play:active{transform:scale(.97)}
-.m-play::after{content:"";position:absolute;top:0;bottom:0;left:-40%;width:30%;transform:skewX(-20deg);
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.13),transparent);animation:mShine 4.2s ease-in-out 1.8s infinite}
-@keyframes mShine{0%{left:-40%}28%,100%{left:130%}}
-.m-play-dot{position:relative;flex:none;width:46px;height:46px;border-radius:50%;background:#E89B13;display:grid;place-items:center;
-  box-shadow:inset 0 -3px 0 rgba(0,0,0,.18),0 6px 16px rgba(232,155,19,.45)}
-.m-play-dot::before{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid rgba(232,155,19,.55);animation:mRing 2.4s ease-out infinite}
-@keyframes mRing{0%{transform:scale(.85);opacity:.9}80%,100%{transform:scale(1.35);opacity:0}}
-.m-play-dot svg{width:18px;height:18px;margin-left:3px;transition:transform .3s cubic-bezier(.2,1.6,.4,1)}
-.m-play:hover .m-play-dot svg{transform:translateX(2px) scale(1.08)}
-.m-play-tx{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0}
-.m-play-tx b{font-size:18px;font-weight:800;letter-spacing:-.01em}
-.m-play-tx small{font-size:11.5px;font-weight:600;color:rgba(252,250,246,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.m-play-arr{flex:none;width:20px;height:20px;opacity:.5;transition:transform .3s cubic-bezier(.2,1.6,.4,1),opacity .3s}
-.m-play:hover .m-play-arr{transform:translateX(4px);opacity:.9}
-
-/* kayıt varken: yeni vardiya (iki dokunuşla onay) */
-.m-new{align-self:center;margin:-4px 0 -2px;padding:6px 12px;border:0;border-radius:999px;background:none;color:#8F887C;
-  font-size:12px;font-weight:700;cursor:pointer;transition:color .2s,background-color .2s}
-.m-new:hover{color:#26282E}
+.m-sub{padding:6px 14px;border-radius:999px;background:color-mix(in srgb,var(--chip) 78%,transparent);color:var(--ink);
+  font-size:12.5px;font-weight:800;letter-spacing:.02em;white-space:nowrap;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:background-color .4s,color .4s}
+.m-new{padding:6px 12px;border:0;border-radius:999px;background:none;color:var(--muted);font-size:12px;font-weight:800;cursor:pointer;transition:color .2s,background-color .2s}
+.m-new:hover{color:var(--ink)}
 .m-new.warn{background:#FCE4E0;color:#C0392B}
 .m-new[hidden]{display:none}
 
-/* kariyer */
-.m-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-.m-stats div{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 4px 8px;border-radius:16px;background:rgba(243,238,228,.9)}
-.m-stats b{font-size:19px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums;color:#26282E}
-.m-stats span{font-size:9.5px;font-weight:800;letter-spacing:.1em;color:#8F887C;text-transform:uppercase;white-space:nowrap}
-.m-stats .gold b{color:#C98A12}
-.m-stats .m-first{display:none}
-.m-stats.empty{grid-template-columns:1fr}
-.m-stats.empty>div:not(.m-first){display:none}
-.m-stats.empty .m-first{display:flex;flex-direction:row;justify-content:center;gap:8px;padding:11px 12px;font-size:12px;font-weight:700;color:#6f685d;letter-spacing:0;text-transform:none}
-.m-first i{font-style:normal;color:#E89B13}
-
-/* ikincil eylemler */
-.m-row{display:flex;gap:7px}
-.m-btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:0 10px;border:0;border-radius:15px;
-  background:#fff;color:#26282E;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;
-  box-shadow:0 1px 0 rgba(40,34,24,.04),0 3px 10px rgba(40,34,24,.07),inset 0 -2px 0 rgba(40,34,24,.06);
-  transition:transform .2s cubic-bezier(.2,1.5,.4,1),background-color .2s}
-.m-btn:hover{background:#FFFDF9;transform:translateY(-1px)}
-.m-btn:active{transform:scale(.95)}
-.m-btn[hidden]{display:none}
-.m-ic{display:grid;place-items:center;width:15px;height:15px}
-.m-ic svg{width:15px;height:15px;display:block}
-.m-btn.install{background:#FFF4DF;color:#9A5A00}
-.m-btn.install .m-ic{color:#E89B13}
-
-.m-foot{pointer-events:auto;margin-top:10px;font-size:10.5px;font-weight:600;color:var(--muted);letter-spacing:.06em;opacity:.8}
-.m-foot i{font-style:normal;color:#E89B13}
-
 /* güncelleme bildirimi */
-.m-update{pointer-events:auto;position:absolute;left:50%;top:calc(env(safe-area-inset-top,0px) + 10px);transform:translate(-50%,-140%);
+.m-update{pointer-events:auto;position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);transform:translate(-50%,160%);
   display:inline-flex;align-items:center;gap:8px;padding:8px 14px 8px 10px;border:0;border-radius:999px;background:#26282E;color:#FCFAF6;
   font-size:12px;font-weight:600;cursor:pointer;box-shadow:0 10px 26px rgba(0,0,0,.2);transition:transform .6s cubic-bezier(.2,1.4,.3,1)}
 .m-update::before{content:"";width:8px;height:8px;border-radius:50%;background:#E89B13;box-shadow:0 0 0 4px rgba(232,155,19,.25)}
@@ -108,18 +93,21 @@ body.menu #top *,body.menu #teams *{pointer-events:none!important}
 .m-update[hidden]{display:none}
 
 /* ---------- giriş / çıkış koreografisi ---------- */
-.m-in .m-tag{animation:mFade .7s ease .75s both}
-.m-in .m-panel{animation:mPanel .9s cubic-bezier(.16,1.15,.3,1) .3s both}
-.m-in .m-panel>*{animation:mItem .7s cubic-bezier(.2,1.3,.3,1) calc(.45s + var(--d,0s)) both}
-.m-in .m-foot{animation:mFade .8s ease 1.2s both}
-@keyframes mFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-@keyframes mPanel{from{opacity:0;transform:translateY(60px) scale(.96)}to{opacity:1;transform:none}}
-@keyframes mItem{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.m-head,.m-panel,.m-foot{transition:opacity .35s ease,transform .45s cubic-bezier(.5,0,.75,0)}
-.m-out .m-head{opacity:0;transform:translateY(-36px) scale(.96)}
-.m-out .m-panel{opacity:0;transform:translateY(70px)}
-.m-out .m-foot{opacity:0}
-.m-out .m-panel>*,.m-out .m-head *{animation:none}
+.m-in .m-tag{animation:mFade .7s ease .8s both}
+.m-in .m-cta{animation:mPop .8s cubic-bezier(.2,1.5,.35,1) .95s both}
+.m-in .m-bar>*{animation:mDrop .7s cubic-bezier(.2,1.4,.35,1) 1.2s both}
+.m-in .m-icons .m-ib{animation:mDrop .7s cubic-bezier(.2,1.4,.35,1) both;animation-delay:calc(1.2s + var(--k,0)*70ms)}
+.m-in .m-icons{animation:none}
+.m-in .m-veil{animation:mFade 1s ease both}
+@keyframes mFade{from{opacity:0}to{opacity:1}}
+@keyframes mPop{0%{opacity:0;transform:translateY(40px) scale(.6)}100%{opacity:1;transform:none}}
+@keyframes mDrop{0%{opacity:0;transform:translateY(-30px) scale(.8)}100%{opacity:1;transform:none}}
+.m-head,.m-cta,.m-bar,.m-veil{transition:opacity .35s ease,transform .45s cubic-bezier(.5,0,.75,0)}
+.m-out .m-head{opacity:0;transform:translateY(-60px) scale(.9)}
+.m-out .m-cta{opacity:0;transform:translateY(80px) scale(.9)}
+.m-out .m-bar{opacity:0;transform:translateY(-30px)}
+.m-out .m-veil{opacity:0}
+.m-out *{animation-play-state:paused}
 
 /* iOS yükleme ipucu */
 .how.ios li{align-items:center}
@@ -127,32 +115,28 @@ body.menu #top *,body.menu #teams *{pointer-events:none!important}
 
 /* ---------- yerleşim varyantları ---------- */
 @media (max-width:360px){
-  .m-play-tx b{font-size:16px}.m-btn{font-size:11.5px;gap:5px;padding:0 6px}.m-stats b{font-size:17px}
-  .m-tn{display:none}
+  .m-play{height:70px;font-size:24px;padding:0 34px}
+  .m-ib{width:42px;height:42px}
 }
 @media (max-height:700px) and (orientation:portrait){
-  .m-col{padding-top:calc(env(safe-area-inset-top,0px) + 18px)}
-  .m-logo{width:min(48vw,210px)}
-  .m-teams{display:none}
-  .m-stage{min-height:110px}
+  .m-col{padding-top:calc(env(safe-area-inset-top,0px) + 64px)}
+  .m-logo{width:min(56vw,250px)}
+  .m-play{height:68px;font-size:24px}
 }
-/* masaüstü + yatay telefon: sol sütun, otel sağda */
-@media (min-width:900px),(orientation:landscape) and (max-height:560px){
-  .m-col{right:auto;width:min(460px,46vw);align-items:stretch;justify-content:center;gap:26px;
-    padding:calc(env(safe-area-inset-top,0px) + 24px) 20px calc(env(safe-area-inset-bottom,0px) + 20px) max(28px,5vw)}
+/* yan yerleşim: yatay telefon + geniş ekran → logo ve düğme solda, otel sağda büyük */
+@media (orientation:landscape) and (max-height:560px),(min-width:900px) and (min-aspect-ratio:5/4){
+  .m-col{right:auto;width:min(560px,46vw);justify-content:center;gap:28px;padding:24px 24px 24px max(32px,6vw)}
   .m-stage{display:none}
-  .m-head{align-items:flex-start;text-align:left}
-  .m-logo{width:min(300px,100%)}
-  .m-foot{margin-top:0}
+  .m-veil-top,.m-veil-bot{display:none}
+  .m-col::before{content:"";position:absolute;inset:0 -90px 0 0;z-index:-1;pointer-events:none;
+    background:linear-gradient(90deg,var(--bg) 52%,color-mix(in srgb,var(--bg) 70%,transparent) 75%,transparent)}
+  .m-logo{width:min(400px,36vw)}
+  .m-bar{padding:22px 28px 0}
 }
+/* yatay telefon: kompakt ölçüler */
 @media (orientation:landscape) and (max-height:560px){
-  .m-col{width:min(380px,52vw);gap:12px}
-  .m-logo{width:170px}
-  .m-teams{display:none}
-  .m-panel{padding:11px;gap:8px;border-radius:24px}
-  .m-play{min-height:56px}
-  .m-play-dot{width:38px;height:38px}
-  .m-stats div{padding:6px 4px}
-  .m-btn{min-height:38px}
-  .m-foot{display:none}
+  .m-col{width:min(400px,50vw);gap:16px;padding:16px 16px 16px max(24px,4vw)}
+  .m-logo{width:200px}
+  .m-play{height:62px;font-size:22px;min-width:220px}
+  .m-bar{padding-top:10px}
 }

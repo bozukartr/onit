@@ -11,7 +11,7 @@
  *
  * Yayın yaparken VERSION değerini artırın (scripts/check-precache.mjs listeyi doğrular).
  */
-const VERSION = '1.1.0';
+const VERSION = '1.2.0';
 const CACHE = `onit-${VERSION}`;
 
 const PRECACHE = [

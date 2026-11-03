@@ -1,82 +1,67 @@
 /**
  * onit — ui/menu.js
- * Ana menü: animasyonlu logo, canlı otel demosu üstünde cam panel,
- * kariyer istatistikleri, nasıl oynanır, ses, uygulama yükleme ve
- * yeni sürüm bildirimi.
- *
- * Arka planda game/flow.js → startMenu() gerçek simülasyonu demo yapay
- * zekâsıyla oynatır; kamera menuFreeArea() ile panellerin dışında kalan
- * bölgeye sığdırılır.
+ * Ana menü = oyun başlık ekranı.
+ *  - Arkada gerçek simülasyon demo yapay zekâsıyla oynar (game/flow.js → startMenu);
+ *    kamera menuFreeArea() ile logo ve düğme arasında kalan alana, hafif yakın plan sığar.
+ *  - Büyük 3B "OYNA" / "DEVAM ET" düğmesi (kayıt varsa gün etiketi), köşe ikonları
+ *    (yükle, ses, nasıl oynanır), rekor kupası, yeni sürüm bildirimi.
+ *  - Düğme sesleri menüde de çalar (AU.ui); oyuna geçiş düğmeden açılan dairesel perdeyle.
  */
 import { AU } from '../audio/audio.js';
-import { DAY_NAMES, REQ, TEAMS } from '../core/config.js';
+import { DAY_NAMES } from '../core/config.js';
 import { KEYS, store } from '../core/storage.js';
-import { $, clamp, eOut, fmt1 } from '../core/utils.js';
+import { $, fmt1, haptic } from '../core/utils.js';
 import { continueGame, newGame } from '../game/flow.js';
 import { loadSave } from '../game/save.js';
 import { canInstall, isIOS, onPWA, promptInstall, applyUpdate } from '../pwa/pwa.js';
-import { shapeSVG } from '../render/shapes.js';
 import { muteIcon } from './hud.js';
 import { logoSVG, playLogoIntro } from './logo.js';
-import { openOv, closeOv, showHelp } from './overlays.js';
+import { openOv, closeOv, setCurtainOrigin, showHelp } from './overlays.js';
 
-const SIDE_MQ = '(min-width: 900px), (orientation: landscape) and (max-height: 560px)';
+const SIDE_MQ = '(orientation: landscape) and (max-height: 560px), (min-width: 900px) and (min-aspect-ratio: 5/4)';
 let root = null, ui = null, frame = null, bound = false, leaving = false;
 
-/** Menüde kameranın kullanabileceği serbest ekran alanı (px). */
+const ICON_SOUND_ON = '<svg viewBox="0 0 14 14"><path d="M2 5h2.2L7.5 2.2v9.6L4.2 9H2z" fill="currentColor"/><path d="M9.6 4.6a3.4 3.4 0 0 1 0 4.8M11.2 3a5.6 5.6 0 0 1 0 8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+const ICON_SOUND_OFF = '<svg viewBox="0 0 14 14"><path d="M2 5h2.2L7.5 2.2v9.6L4.2 9H2z" fill="currentColor"/><path d="M9.5 5l3 3M12.5 5l-3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+
+/** Menüde kameranın kullanabileceği ekran alanı (px). */
 export function menuFreeArea(VW, VH) {
   if (!root || !ui) return null;
   if (frame && frame.w === VW && frame.h === VH) return frame.area;
-  const side = window.matchMedia(SIDE_MQ).matches;
-  const col = ui.col, head = ui.head, panel = ui.panel;
   let area;
-  if (side) {
-    const right = col.offsetLeft + col.offsetWidth;
-    area = { left: right + 8, right: VW - 16, top: 24, bottom: VH - 24, zoom: 1.04 };
+  if (window.matchMedia(SIDE_MQ).matches) {
+    const right = ui.col.offsetLeft + ui.col.offsetWidth;
+    const short = VH <= 560;
+    area = { left: right - 30, right: VW - 10, top: short ? 50 : 70, bottom: VH - (short ? 8 : 24), zoom: short ? 1.02 : 1.06 };
   } else {
-    const top = col.offsetTop + head.offsetTop + head.offsetHeight + 14;
-    const bottom = col.offsetTop + panel.offsetTop + 26;
-    area = { left: 10, right: VW - 10, top, bottom: Math.max(top + 120, bottom), zoom: 1 };
+    /* logo ile düğme arası; perdelerin altına biraz taşar → tam ekran sahne hissi */
+    const top = ui.col.offsetTop + ui.head.offsetTop + ui.head.offsetHeight + 4;
+    const bottom = ui.col.offsetTop + ui.cta.offsetTop + 34;
+    area = { left: 0, right: VW, top, bottom: Math.max(top + 140, bottom), zoom: 1.04 };
   }
   frame = { w: VW, h: VH, area };
   return area;
 }
 export const invalidateMenuLayout = () => { frame = null; };
 
-function fmtNum(n) { return n >= 1000 ? (n / 1000).toFixed(1).replace('.', ',') + 'B' : String(n); }
-
-function countTo(node, to, delay) {
-  if (!to) { node.textContent = '—'; return; }
-  const t0 = performance.now() + delay;
-  const tick = () => {
-    const t = clamp((performance.now() - t0) / 900, 0, 1);
-    node.textContent = fmtNum(Math.round(to * eOut(t)));
-    if (t < 1) requestAnimationFrame(tick);
-  };
-  node.textContent = '0';
-  requestAnimationFrame(tick);
-}
-
-function refreshStats() {
+function refreshCTA() {
   const best = store.get(KEYS.best, null) || {};
   const st = store.get(KEYS.stats, null) || {};
-  const fresh = !best.score && !st.shifts;
-  ui.stats.classList.toggle('empty', fresh);
-  if (!fresh) {
-    countTo(ui.best, best.score || 0, 900);
-    countTo(ui.day, Math.max(best.day || 0, st.days || 0), 1000);
-    countTo(ui.shifts, st.shifts || 0, 1100);
-  }
+  const day = Math.max(best.day || 0, st.days || 0);
+  ui.trophy.hidden = !best.score;
+  ui.best.textContent = best.score || 0;
+  ui.day.textContent = day ? `· ${day}. gün` : '';
+
   const save = loadSave();
   ui.newRun.hidden = !save; resetNewRun();
+  ui.badge.hidden = !save;
   if (save) {
-    ui.playTitle.textContent = 'Devam et';
-    ui.playSub.textContent = save.at === 'summary'
-      ? `${save.day}. gün sonu · ${save.score} talep · ${fmt1(save.rating)}★`
-      : `${save.day}. gün · ${DAY_NAMES[(save.day - 1) % 7]} · ${save.score} talep · ${fmt1(save.rating)}★`;
+    ui.playTitle.textContent = 'DEVAM ET';
+    ui.badge.textContent = save.at === 'summary' ? `${save.day}. GÜN SONU` : `${save.day}. GÜN`;
+    ui.playSub.textContent = `${DAY_NAMES[(save.day - 1) % 7]} · ${save.score} talep · ${fmt1(save.rating)}★`;
   } else {
     const tutDone = store.get(KEYS.tutorial, 0) >= 2;
-    ui.playTitle.textContent = 'Vardiyaya başla';
+    ui.playTitle.textContent = 'OYNA';
     ui.playSub.textContent = tutDone ? '1. gün · Pazartesi 07:00' : 'Kısa bir eğitimle başlar';
   }
 }
@@ -88,19 +73,21 @@ function resetNewRun() {
   ui.newRun.classList.remove('warn');
   ui.newRun.textContent = 'Yeni vardiya başlat';
 }
+
 function startRun(fn) {
   if (leaving) return; leaving = true;
-  AU.init(); AU.click();
-  root.classList.add('m-out');
-  fn();
+  AU.init(); AU.ui('start'); haptic(12);
+  const r = ui.play.getBoundingClientRect();
+  setCurtainOrigin(r.left + r.width / 2, r.top + r.height / 2);
+  ui.play.classList.add('press');
+  setTimeout(() => { ui.play.classList.remove('press'); root.classList.add('m-out'); fn(); }, 110);
 }
 
 function refreshSound() {
-  ui.sound.querySelector('.m-ic').innerHTML = AU.on
-    ? '<svg viewBox="0 0 14 14"><path d="M2 5h2.2L7.5 2.2v9.6L4.2 9H2z" fill="currentColor"/><path d="M9.6 4.6a3.4 3.4 0 0 1 0 4.8M11.2 3a5.6 5.6 0 0 1 0 8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>'
-    : '<svg viewBox="0 0 14 14"><path d="M2 5h2.2L7.5 2.2v9.6L4.2 9H2z" fill="currentColor"/><path d="M9.5 5l3 3M12.5 5l-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
-  ui.sound.querySelector('.m-lb').textContent = AU.on ? 'Ses açık' : 'Ses kapalı';
+  ui.sound.querySelector('.m-ic').innerHTML = AU.on ? ICON_SOUND_ON : ICON_SOUND_OFF;
+  ui.sound.classList.toggle('off', !AU.on);
   ui.sound.setAttribute('aria-pressed', String(AU.on));
+  ui.sound.title = AU.on ? 'Ses açık' : 'Ses kapalı';
 }
 
 function refreshInstall() { ui.install.hidden = !canInstall(); }
@@ -116,45 +103,40 @@ function showIOSInstall() {
     </ol>
     <button class="cta" id="iosOk">Tamam</button>
   </div>`);
-  $('#iosOk').onclick = () => { AU.click(); closeOv(); };
-}
-
-function buildTeams() {
-  ui.teams.innerHTML = REQ.map((k, i) => {
-    const t = TEAMS[k];
-    return `<li style="--i:${i};--c:${t.color}" title="${t.long}"><span class="m-tk">${shapeSVG(t.shape, '#fff', 13, 12)}</span><span class="m-tn">${t.name}</span></li>`;
-  }).join('');
+  $('#iosOk').onclick = () => { AU.ui('click'); closeOv(); };
 }
 
 function bind() {
   if (bound) return; bound = true;
   ui.play.addEventListener('click', () => startRun(loadSave() ? continueGame : newGame));
   ui.newRun.addEventListener('click', () => {
+    AU.init();
     if (!ui.newRun.classList.contains('warn')) {
+      AU.ui('no');
       ui.newRun.classList.add('warn');
-      ui.newRun.textContent = 'Emin misin? Kayıtlı vardiya silinecek · tekrar dokun';
+      ui.newRun.textContent = 'Emin misin? Kayıt silinecek · tekrar dokun';
       clearTimeout(newRunTO); newRunTO = setTimeout(resetNewRun, 3500);
       return;
     }
     resetNewRun(); startRun(newGame);
   });
-  ui.how.addEventListener('click', () => { AU.init(); AU.click(); showHelp({ fromMenu: true }); });
+  ui.how.addEventListener('click', () => { AU.init(); AU.ui('click'); showHelp({ fromMenu: true }); });
   ui.sound.addEventListener('click', () => {
-    AU.init(); AU.on = !AU.on; store.set(KEYS.sound, AU.on); refreshSound(); muteIcon(); AU.click();
+    AU.init(); AU.on = !AU.on; store.set(KEYS.sound, AU.on); refreshSound(); muteIcon(); AU.ui('click'); haptic(6);
   });
   ui.install.addEventListener('click', async () => {
-    AU.init(); AU.click();
+    AU.init(); AU.ui('click');
     const r = await promptInstall();
     if (r === 'ios' || (r === 'unavailable' && isIOS())) showIOSInstall();
     refreshInstall();
   });
   ui.update.addEventListener('click', () => { ui.update.disabled = true; applyUpdate(); });
-  /* klavye: Enter → oyna */
+  /* klavye: Enter / Space → oyna */
   window.addEventListener('keydown', e => {
     if (!document.body.classList.contains('menu') || leaving || document.querySelector('#ov.show')) return;
-    if (e.key === 'Enter' && document.activeElement === document.body) { e.preventDefault(); ui.play.click(); }
+    if ((e.key === 'Enter' || e.code === 'Space') && document.activeElement === document.body) { e.preventDefault(); ui.play.click(); }
   });
-  ui.logo.addEventListener('click', () => { AU.init(); playLogoIntro(ui.logo.querySelector('svg')); });
+  ui.logo.addEventListener('click', () => { AU.init(); AU.ui('vip'); playLogoIntro(ui.logo.querySelector('svg')); });
   onPWA('installable', refreshInstall);
   onPWA('installed', refreshInstall);
   onPWA('update-ready', () => { ui.update.hidden = false; requestAnimationFrame(() => ui.update.classList.add('show')); });
@@ -165,12 +147,13 @@ function bind() {
 export function initMenu() {
   root = $('#menu');
   ui = {
-    col: $('#menu .m-col'), head: $('#menu .m-head'), panel: $('#mPanel'), logo: $('#mLogo'),
-    teams: $('#mTeams'), play: $('#mPlay'), playSub: $('#mPlaySub'), playTitle: $('#mPlayTitle'), newRun: $('#mNew'), how: $('#mHow'), sound: $('#mSound'),
-    install: $('#mInstall'), stats: $('#menu .m-stats'), update: $('#mUpdate'), best: $('#msBest'), day: $('#msDay'), shifts: $('#msShifts'),
+    col: $('#menu .m-col'), head: $('#menu .m-head'), cta: $('#mPanel'), logo: $('#mLogo'),
+    play: $('#mPlay'), playSub: $('#mPlaySub'), playTitle: $('#mPlayTitle'), badge: $('#mBadge'), newRun: $('#mNew'),
+    how: $('#mHow'), sound: $('#mSound'), install: $('#mInstall'), update: $('#mUpdate'),
+    trophy: $('#mTrophy'), best: $('#msBest'), day: $('#msDay'),
   };
+  [...root.querySelectorAll('.m-icons .m-ib')].forEach((b, i) => b.style.setProperty('--k', i));
   ui.logo.innerHTML = logoSVG({ animated: true }) + '<span class="sr">onit</span>';
-  buildTeams();
   bind();
 }
 
@@ -183,8 +166,8 @@ export function showMenu() {
   root.classList.add('m-in');
   root.removeAttribute('inert');
   invalidateMenuLayout();
-  refreshStats(); refreshSound(); refreshInstall();
-  playLogoIntro(ui.logo.querySelector('svg'), { delay: 180 });
+  refreshCTA(); refreshSound(); refreshInstall();
+  playLogoIntro(ui.logo.querySelector('svg'), { delay: 180, onLand: () => AU.ui('coin') });
 }
 
 export function hideMenu() {

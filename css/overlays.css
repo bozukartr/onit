@@ -55,5 +55,9 @@
 .confetti i{position:absolute;top:-14px;left:var(--x);width:7px;height:11px;background:var(--c);border-radius:2px;opacity:0;animation:conf var(--t,1.9s) cubic-bezier(.25,.55,.35,1) var(--d) forwards}
 .confetti i.r{border-radius:50%;width:8px;height:8px}
 @keyframes conf{0%{opacity:1;transform:translate(0,0) rotate(0)}85%{opacity:1}100%{opacity:0;transform:translate(var(--dx),640px) rotate(var(--r))}}
-#curtain{position:absolute;inset:0;z-index:6;background:var(--bg);opacity:0;pointer-events:none;transition:opacity .38s ease}
-#curtain.on{opacity:1;pointer-events:auto}
+#curtain{position:absolute;inset:0;z-index:6;background:var(--bg);pointer-events:none;
+  clip-path:circle(0px at var(--cx,50%) var(--cy,50%));transition:clip-path .5s cubic-bezier(.65,0,.35,1)}
+#curtain.on{clip-path:circle(150vmax at var(--cx,50%) var(--cy,50%));pointer-events:auto;transition-duration:.46s}
+#curtain i{position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:#E89B13;
+  transform:scale(0);transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
+#curtain.on i{transform:scale(1);transition-delay:.3s}

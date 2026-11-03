@@ -58,7 +58,12 @@ export function updatePalette(rdt){
   if(g.mode==='play'){
     if(g.phase==='day'){const h=hourNow();dt=h<8?(8-h)*.3:h>18?eInOut(clamp((h-18)/3,0,1)):0;night=Math.max(night,h>21?(h-21)/2*.28:0);}
     else dt=1-g.nightT;
-  }else night=0;
+  }else{
+    /* başlık ekranı: ~80 sn'lik yavaş gün döngüsü (gündüz → gün batımı → gece → şafak) */
+    const u=(((now-(g.menuT0||0))/80)%1+1)%1,rp=(a,b)=>eInOut(clamp((u-a)/(b-a),0,1));
+    dt=rp(.26,.4)*(1-rp(.82,.96));
+    night=.85*rp(.42,.56)*(1-rp(.72,.86));
+  }
   if(g.dusk===undefined)g.dusk=dt;
   g.dusk+=(dt-g.dusk)*(1-Math.exp(-rdt*2));
   const dusk=g.dusk;

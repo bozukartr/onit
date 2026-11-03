@@ -30,7 +30,7 @@ import { initMenu } from './ui/menu.js';
 import { ovOpen } from './ui/overlays.js';
 import { at, tiles } from './world/map.js';
 
-const VERSION = '1.1.0';
+const VERSION = '1.2.0';
 
 /* ---------- döngü ---------- */
 let last = performance.now() / 1000;

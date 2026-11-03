@@ -3,7 +3,8 @@
  * Girdi: sürükle-bırak rota, dokun-seç, rota sonuna ekleme, iptal.
  */
 import { AU } from '../audio/audio.js';
-import { TEAMS } from '../core/config.js';
+import { ORDER, TEAMS } from '../core/config.js';
+import { sparkle } from '../render/effects.js';
 import { haptic } from '../core/utils.js';
 import { appendPlan, busyPlan, cancelRoute, commitPlan, laneOf, lastStopOf, pickDispatch, planLegs, queueRooms } from '../game/staff.js';
 import { fx, g, matches, now } from '../game/state.js';
@@ -117,10 +118,19 @@ function tapAppend(st,room){
   AU.tick(q.length+1);haptic(7);
   if(g.tut){if(g.tut.step===1)g.tut.dispatched=true;if(wasBusy)g.tut.appended=true;}
 }
+/* menü oyuncağı: otele dokununca renkli dalga + nota */
+let pokeN=0;
+function menuPoke(e){
+  const w=toWorld(e.clientX,e.clientY),k=ORDER[pokeN%5],col=TEAMS[k].rgb;
+  fx.ripples.push({x:w.x,y:w.y,t0:now,col,dur:.7,r0:.12,r1:.85});
+  sparkle(w.x,w.y,col,7);
+  AU.ui('poke',pokeN++);haptic(5);
+}
 /** Canvas ve pencere girdi dinleyicilerini bağlar (main.js). */
 export function initInput(){
   cv.addEventListener('pointerdown',e=>{
     AU.init();
+    if(g&&g.mode==='menu'&&!ovOpen){menuPoke(e);return;}
     if(!canDrag())return;
     const w=toWorld(e.clientX,e.clientY);
     const st=hitStaff(w);

@@ -18,7 +18,7 @@ export function startMenu(){
   closeOv();
   document.body.classList.add('menu');
   el.teams.innerHTML='';el.hint.classList.remove('show');el.banner.classList.remove('show');el.toast.classList.remove('show');
-  newState('menu');g.day=6;g.dayT=.34;
+  newState('menu');g.day=6;g.dayT=.34;g.menuT0=now;
   unlockPass(now+.25,true);
   for(const k of REQ)for(let i=0;i<(k==='H'||k==='K'?2:1);i++)addStaff(k,now+1.4+Math.random()*.9);
   camSnap();cam.s*=1.18;

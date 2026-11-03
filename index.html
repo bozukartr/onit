@@ -81,42 +81,46 @@
 <div class="hud" id="hint"></div>
 <div class="hud" id="teams"></div>
 
-<!-- ============ ANA MENÜ ============ -->
+<!-- ============ ANA MENÜ (başlık ekranı) ============ -->
 <section id="menu" aria-label="Ana menü">
+  <div class="m-veil m-veil-top" aria-hidden="true"></div>
+  <div class="m-veil m-veil-bot" aria-hidden="true"></div>
+
+  <div class="m-bar">
+    <div class="m-trophy" id="mTrophy" hidden>
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 3h8v4.2a4 4 0 0 1-8 0z" fill="#E2A21B"/><path d="M6 4.2H3.6v1.4A2.6 2.6 0 0 0 6.2 8.2M14 4.2h2.4v1.4a2.6 2.6 0 0 1-2.6 2.6" fill="none" stroke="#E2A21B" stroke-width="1.6" stroke-linecap="round"/><path d="M9 11h2v3H9z" fill="#C98A12"/><rect x="6.2" y="14" width="7.6" height="2.8" rx="1.2" fill="#C98A12"/></svg>
+      <b id="msBest">0</b><span id="msDay"></span>
+    </div>
+    <div class="m-icons">
+      <button class="m-ib m-ib-install" id="mInstall" hidden aria-label="Uygulamayı yükle" title="Uygulamayı yükle"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1.8v7M4 6l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.2 9.5v1.6c0 .6.5 1.1 1.1 1.1h7.4c.6 0 1.1-.5 1.1-1.1V9.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+      <button class="m-ib" id="mSound" aria-pressed="true" aria-label="Ses" title="Ses"><span class="m-ic" aria-hidden="true"></span></button>
+      <button class="m-ib" id="mHow" aria-label="Nasıl oynanır" title="Nasıl oynanır"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M5 5.1a2.1 2.1 0 1 1 3 1.9c-.7.3-1 .8-1 1.5v.3" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><circle cx="7" cy="11.4" r="1.15" fill="currentColor"/></svg></button>
+    </div>
+  </div>
+
   <div class="m-col">
     <header class="m-head">
       <h1 class="m-logo" id="mLogo" title="onit"><span class="sr">onit</span></h1>
       <p class="m-tag">Otel Operasyon Müdürü</p>
     </header>
     <div class="m-stage" aria-hidden="true"></div>
-    <div class="m-panel" id="mPanel">
-      <ul class="m-teams" id="mTeams" aria-label="Ekipler" style="--d:0s"></ul>
-      <button class="m-play" id="mPlay" style="--d:.06s">
-        <span class="m-play-dot" aria-hidden="true"><svg viewBox="0 0 18 18"><path d="M5 3.2v11.6a.8.8 0 0 0 1.2.7l9.2-5.8a.8.8 0 0 0 0-1.4L6.2 2.5a.8.8 0 0 0-1.2.7z" fill="#fff"/></svg></span>
-        <span class="m-play-tx"><b id="mPlayTitle">Vardiyaya başla</b><small id="mPlaySub">1. gün · Pazartesi 07:00</small></span>
-        <svg class="m-play-arr" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="m-cta" id="mPanel">
+      <button class="m-play" id="mPlay">
+        <span class="m-badge" id="mBadge" hidden></span>
+        <svg class="m-play-ic" viewBox="0 0 18 18" aria-hidden="true"><path d="M5 3.2v11.6a.8.8 0 0 0 1.2.7l9.2-5.8a.8.8 0 0 0 0-1.4L6.2 2.5a.8.8 0 0 0-1.2.7z" fill="currentColor"/></svg>
+        <span id="mPlayTitle">OYNA</span>
       </button>
-      <button class="m-new" id="mNew" hidden style="--d:.09s">Yeni vardiya başlat</button>
-      <div class="m-stats" style="--d:.12s" aria-label="Kariyer">
-        <div class="gold"><b id="msBest">—</b><span>Rekor</span></div>
-        <div><b id="msDay">—</b><span>En uzun gün</span></div>
-        <div><b id="msShifts">0</b><span>Vardiya</span></div>
-        <div class="m-first"><i>●</i> İlk vardiyan seni bekliyor</div>
-      </div>
-      <nav class="m-row" style="--d:.18s" aria-label="Menü">
-        <button class="m-btn" id="mHow"><span class="m-ic"><svg viewBox="0 0 14 14"><path d="M5 5.1a2.1 2.1 0 1 1 3 1.9c-.7.3-1 .8-1 1.5v.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="7" cy="11.4" r="1.1" fill="currentColor"/></svg></span><span>Nasıl oynanır</span></button>
-        <button class="m-btn" id="mSound" aria-pressed="true"><span class="m-ic"></span><span class="m-lb">Ses açık</span></button>
-        <button class="m-btn install" id="mInstall" hidden><span class="m-ic"><svg viewBox="0 0 14 14"><path d="M7 1.8v7M4 6l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.2 9.5v1.6c0 .6.5 1.1 1.1 1.1h7.4c.6 0 1.1-.5 1.1-1.1V9.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Yükle</span></button>
-      </nav>
+      <p class="m-sub" id="mPlaySub">Kısa bir eğitimle başlar</p>
+      <button class="m-new" id="mNew" hidden>Yeni vardiya başlat</button>
     </div>
-    <footer class="m-foot"><i>●</i> I'm on it! · <span id="mVer">v1.0.0</span></footer>
   </div>
+
   <button class="m-update" id="mUpdate" hidden>Yeni sürüm hazır · <b>Yenile</b></button>
 </section>
 
 <!-- ============ KATMANLAR ============ -->
 <div id="ov" class="ov" role="dialog" aria-modal="true"></div>
-<div id="curtain"></div>
+<div id="curtain" aria-hidden="true"><i></i></div>
 
 <noscript><p style="position:fixed;inset:auto 16px 16px;padding:14px;border-radius:14px;background:#26282E;color:#F3EEE4;font:600 14px system-ui">onit için JavaScript gerekli.</p></noscript>
 </body>
